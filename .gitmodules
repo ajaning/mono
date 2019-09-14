@@ -70,4 +70,4 @@
 	url = git://github.com/mono/illinker-test-assets.git
 [submodule "external/bdwgc"]
 	path = external/bdwgc
-	url = git@github.com:Unity-Technologies/bdwgc.git
+	url = git://github.com/Unity-Technologies/bdwgc.git
