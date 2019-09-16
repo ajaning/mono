@@ -56,6 +56,7 @@ MonoClass* mono_unity_object_get_class(MonoObject *obj);
 MonoObject* mono_unity_object_compare_exchange(MonoObject **location, MonoObject *value, MonoObject *comparand);
 MonoObject* mono_unity_object_exchange(MonoObject **location, MonoObject *value);
 gboolean mono_unity_object_check_box_cast(MonoObject *obj, MonoClass *klass);
+MONO_API MonoDomain* mono_unity_object_domain(MonoObject *obj);
 
 //class 
 const char* mono_unity_class_get_image_name(MonoClass* klass);
@@ -131,12 +132,19 @@ guint mono_unity_generic_inst_get_type_argc(MonoGenericInst *inst);
 MonoType* mono_unity_generic_inst_get_type_argument(MonoGenericInst *inst, int index);
 
 //exception
+MONO_API const char* mono_unity_get_managed_backtrace(MonoException *exc);
 MonoString* mono_unity_exception_get_message(MonoException *exc);
 MonoString* mono_unity_exception_get_stack_trace(MonoException *exc);
 MonoObject* mono_unity_exception_get_inner_exception(MonoException *exc);
 MonoArray* mono_unity_exception_get_trace_ips(MonoException *exc);
 void mono_unity_exception_set_trace_ips(MonoException *exc, MonoArray *ips);
 MonoException* mono_unity_exception_get_marshal_directive(const char* msg);
+
+typedef void (*MonoCriticalExceptionCallback) (MonoException* stackTrace);
+
+MONO_API void mono_unity_exception_set_stacktrace_callback (MonoCriticalExceptionCallback callback);
+
+MONO_API void mono_unity_exception_send_critical_stacktrace (MonoException* stacktrace);
 
 //defaults
 MonoClass* mono_unity_defaults_get_int_class();

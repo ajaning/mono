@@ -64,6 +64,7 @@
 #include <mono/metadata/mono-endian.h>
 #include <mono/metadata/environment.h>
 #include <mono/metadata/mono-mlist.h>
+#include <mono/metadata/unity-utils.h>
 #include <mono/utils/mono-mmap.h>
 #include <mono/utils/mono-logger-internals.h>
 #include <mono/utils/mono-error.h>
@@ -2008,6 +2009,12 @@ mono_handle_exception_internal (MonoContext *ctx, MonoObject *obj, gboolean resu
 
 		StackFrameInfo catch_frame;
 		res = handle_exception_first_pass (&ctx_cp, obj, &first_filter_idx, &ji, &prev_ji, non_exception, &catch_frame);
+
+		// trace IPs should be setup now that first pass was called
+		if (stack_overflow)
+		{
+			mono_unity_exception_send_critical_stacktrace ((MonoException *)obj);
+		}
 
 		if (!res) {
 			if (mini_get_debug_options ()->break_on_exc)

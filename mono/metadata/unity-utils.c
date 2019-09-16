@@ -43,6 +43,8 @@
 
 #undef exit
 
+static MonoCriticalExceptionCallback gCriticalExceptionCallback = NULL;
+
 void unity_mono_exit( int code )
 {
 	//fprintf( stderr, "mono: exit called, code %d\n", code );
@@ -266,6 +268,11 @@ MonoObject* mono_unity_object_exchange(MonoObject **location, MonoObject *value)
 gboolean mono_unity_object_check_box_cast(MonoObject *obj, MonoClass *klass)
 {
 	return (obj->vtable->klass->element_class == klass->element_class);
+}
+
+MonoDomain* mono_unity_object_domain(MonoObject *obj)
+{
+	return mono_object_domain(obj);
 }
 
 //class
@@ -839,6 +846,11 @@ MonoType* mono_unity_generic_inst_get_type_argument(MonoGenericInst *inst, int i
 
 //exception
 
+const char* mono_unity_get_managed_backtrace(MonoException *exc)
+{
+	return mono_exception_get_managed_backtrace(exc);
+}
+
 MonoString* mono_unity_exception_get_message(MonoException *exc)
 {
 	return exc->message;
@@ -868,6 +880,22 @@ void mono_unity_exception_set_trace_ips(MonoException *exc, MonoArray *ips)
 MonoException* mono_unity_exception_get_marshal_directive(const char* msg)
 {
 	return mono_exception_from_name_msg(mono_get_corlib(), "System.Runtime.InteropServices", "MarshalDirectiveException", msg);
+}
+
+void
+mono_unity_exception_set_stacktrace_callback (MonoCriticalExceptionCallback callback)
+{
+	g_assert (callback);
+
+	gCriticalExceptionCallback = callback;
+}
+
+void
+mono_unity_exception_send_critical_stacktrace (MonoException* stacktrace)
+{
+	g_assert(stacktrace);
+
+	gCriticalExceptionCallback(stacktrace);
 }
 
 //defaults
